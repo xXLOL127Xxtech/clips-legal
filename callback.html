@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="referrer" content="no-referrer">
+<title>OAuth Callback</title>
+<style>
+:root{--bg:#fff;--fg:#1a1a1a;--muted:#555;--link:#0b57d0;--card:#f4f5f7;--bd:#d9dce1}
+@media (prefers-color-scheme:dark){:root{--bg:#121316;--fg:#e8e8ea;--muted:#a0a3aa;--link:#8ab4f8;--card:#1c1e22;--bd:#34373d}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:1.7rem;line-height:1.25}h2{font-size:1.2rem;margin-top:2rem}
+a{color:var(--link)}.muted{color:var(--muted);font-size:.9rem}
+nav ul{padding-left:1.2rem}
+code,pre{font-family:ui-monospace,Menlo,Consolas,monospace}
+</style>
+</head>
+<body>
+<main>
+<h1>OAuth Callback</h1>
+<div id="missing" hidden>
+<p><strong>No authorization code found in this URL.</strong></p>
+<p>Start the login flow again from the bot, and make sure the provider redirects back to this page with a <code>code</code> parameter.</p>
+</div>
+<div id="result" hidden>
+<h2>code</h2>
+<pre id="code" style="white-space:pre-wrap;word-break:break-all;background:var(--card);border:1px solid var(--bd);padding:12px;border-radius:8px"></pre>
+<button type="button" id="copycode">Copy</button>
+<div id="stateBox" hidden>
+<h2>state</h2>
+<pre id="state" style="white-space:pre-wrap;word-break:break-all;background:var(--card);border:1px solid var(--bd);padding:12px;border-radius:8px"></pre>
+<button type="button" id="copystate">Copy</button>
+</div>
+<p class="muted">Paste the code into the Telegram bot. This page stores and sends nothing; values are read from the URL in your browser only.</p>
+</div>
+<p><a href="index.html">&larr; Home</a></p>
+<script>
+(function(){
+  var p=new URLSearchParams(location.search);
+  var code=p.get("code"),state=p.get("state");
+  function wire(btn,text){
+    btn.addEventListener("click",function(){
+      function done(){var o=btn.textContent;btn.textContent="Copied";setTimeout(function(){btn.textContent=o},1500)}
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,fallback)}else{fallback()}
+      function fallback(){
+        var t=document.createElement("textarea");t.value=text;document.body.appendChild(t);t.select();
+        try{document.execCommand("copy");done()}catch(e){}
+        document.body.removeChild(t);
+      }
+    });
+  }
+  if(!code){document.getElementById("missing").hidden=false;return}
+  document.getElementById("result").hidden=false;
+  document.getElementById("code").textContent=code;
+  wire(document.getElementById("copycode"),code);
+  if(state){
+    document.getElementById("stateBox").hidden=false;
+    document.getElementById("state").textContent=state;
+    wire(document.getElementById("copystate"),state);
+  }
+})();
+</script>
+</main>
+</body>
+</html>
